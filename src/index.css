@@ -52,6 +52,10 @@
     --sidebar-border: 240 15% 18%;
     --sidebar-ring: 210 100% 50%;
     --sidebar-muted: 240 15% 14%;
+    --sidebar-header: 240 24% 8%;
+    --sidebar-hover: 240 18% 15%;
+    --sidebar-active: 210 100% 52%;
+    --sidebar-active-foreground: 0 0% 100%;
 
     /* Header */
     --header-background: 240 24% 11%;
@@ -68,6 +72,13 @@
 }
 
 @layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+
   * {
     @apply border-border;
   }
