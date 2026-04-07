@@ -1,12 +1,12 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 
 const data = [
-  { name: "GolSat Rastreamento", value: 1245, color: "hsl(210, 100%, 40%)" },
-  { name: "Tracker do Brasil", value: 892, color: "hsl(142, 71%, 45%)" },
-  { name: "Volvo Segurança", value: 654, color: "hsl(25, 95%, 53%)" },
-  { name: "Scania Monitoramento", value: 432, color: "hsl(262, 83%, 58%)" },
-  { name: "Mercedes Guard", value: 321, color: "hsl(173, 80%, 40%)" },
-  { name: "Iveco Protect", value: 198, color: "hsl(0, 72%, 51%)" },
+  { name: "GolSat Rastreamento", value: 1245, color: "hsl(214, 68%, 46%)" },
+  { name: "Tracker do Brasil", value: 892, color: "hsl(142, 38%, 44%)" },
+  { name: "Volvo Segurança", value: 654, color: "hsl(28, 78%, 56%)" },
+  { name: "Scania Monitoramento", value: 432, color: "hsl(260, 52%, 58%)" },
+  { name: "Mercedes Guard", value: 321, color: "hsl(175, 46%, 44%)" },
+  { name: "Iveco Protect", value: 198, color: "hsl(0, 58%, 56%)" },
   { name: "Outras", value: 567, color: "hsl(220, 10%, 60%)" },
 ];
 

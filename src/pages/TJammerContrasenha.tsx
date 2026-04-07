@@ -1,43 +1,67 @@
 import { useState } from "react";
-import { Breadcrumb } from "@/components/layout/Breadcrumb";
+import { Shield, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const TJammerContrasenha = () => {
-  const [resultado, setResultado] = useState<string | null>(null);
+export default function TJammerContrasenha() {
+  const [senha, setSenha] = useState("");
+  const [comando, setComando] = useState("");
+  const [contrasenha, setContrasenha] = useState<string | null>(null);
 
   const handleGerar = () => {
-    setResultado("A7F3-B92E");
+    // Mock - algoritmo proprietário será implementado
+    setContrasenha("A7F3-BK92-X41D");
   };
 
   return (
-    <div>
-      <Breadcrumb items={[{ label: "TJammer Contrasenha" }]} />
-      <h1 className="text-2xl font-bold text-foreground mb-6">TJammer Contrasenha</h1>
+    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
+      <h1 className="text-2xl font-bold text-foreground">TJammer Contrasenha</h1>
 
-      <div className="bg-card rounded-lg border p-6 max-w-xl">
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              *Senha do Control
-            </label>
-            <Input type="number" placeholder="Ex: 56" />
+      <Card className="border shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Shield size={18} className="text-primary" />
+            Gerar Contrasenha de Desbloqueio
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="senha">*Senha do Control</Label>
+            <Input
+              id="senha"
+              type="number"
+              placeholder="Ex: 56"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Número exibido pelo equipamento Control no veículo
+            </p>
           </div>
-          <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Selecione o equipamento
-            </label>
-            <Input placeholder="Buscar por número de série do TJammer..." />
+
+          <div className="space-y-2">
+            <Label>Selecione o equipamento</Label>
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input placeholder="Buscar por número de série do TJammer" className="pl-9" />
+            </div>
           </div>
-          <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              *Comando
-            </label>
-            <Select>
+
+          <div className="space-y-2">
+            <Label>*Comando</Label>
+            <Select value={comando} onValueChange={setComando}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o comando" />
+                <SelectValue placeholder="Selecione o tipo de desbloqueio" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="bloqueio_permanente">Bloqueio Permanente</SelectItem>
@@ -49,26 +73,34 @@ const TJammerContrasenha = () => {
             </Select>
           </div>
 
-          <Button className="w-full gap-2" onClick={handleGerar}>
-            <Shield className="h-4 w-4" />
+          <div className="space-y-2">
+            <Label>Observação</Label>
+            <Textarea placeholder="Motivo do desbloqueio (opcional)" rows={3} />
+          </div>
+
+          <Button
+            onClick={handleGerar}
+            className="w-full"
+            disabled={!senha || !comando}
+          >
             Gerar Contrasenha
           </Button>
 
-          {resultado && (
-            <div className="mt-4 p-6 bg-primary/5 rounded-lg border border-primary/20 text-center">
-              <p className="text-sm text-muted-foreground mb-2">Contrasenha gerada:</p>
-              <p className="text-4xl font-bold text-primary tracking-wider">{resultado}</p>
-              <div className="mt-3 text-xs text-muted-foreground space-y-0.5">
-                <p>Cliente: GolSat Rastreamento</p>
-                <p>Veículo: ABC-1234</p>
-                <p>Técnico: Carlos Silva</p>
+          {contrasenha && (
+            <div className="mt-4 p-6 bg-primary/5 border border-primary/20 rounded-lg text-center space-y-3">
+              <p className="text-sm text-muted-foreground">Contrasenha gerada:</p>
+              <p className="text-3xl font-bold text-primary tracking-widest">
+                {contrasenha}
+              </p>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p>Cliente: <strong>Volare Segurança</strong></p>
+                <p>Veículo: <strong>ABC-1234</strong></p>
+                <p>Técnico: <strong>Carlos Silva</strong></p>
               </div>
             </div>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default TJammerContrasenha;
+}

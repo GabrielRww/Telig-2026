@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   Shield,
   Radio,
-  Eye,
+  ClipboardCheck,
   Car,
   Package,
   ClipboardList,
@@ -38,7 +38,7 @@ const menuItems: MenuItem[] = [
   { label: "Dashboard", path: "/", icon: LayoutDashboard },
   { label: "Contasenha", path: "/contasenha", icon: Shield },
   { label: "TJammer Contrasenha", path: "/tjammer", icon: Radio },
-  { label: "Acompanhamento", path: "/acompanhamento", icon: Eye },
+  { label: "Auditoria", path: "/auditoria", icon: ClipboardCheck },
   { label: "Consulta de Veículos", path: "/veiculos-consulta", icon: Car },
   { label: "Estoque", path: "/estoque", icon: Package },
   { label: "Ordem de Serviço", path: "/ordens", icon: ClipboardList },
@@ -74,6 +74,15 @@ export function AppSidebar() {
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
   const location = useLocation();
 
+  const itemBaseClass =
+    "group relative flex items-center w-full overflow-hidden px-4 py-2.5 text-sm border-r-2 border-transparent rounded-r-md transition-[background-color,color,border-color,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sidebar-active/40 active:translate-y-px";
+  const itemTopLineClass =
+    "before:pointer-events-none before:absolute before:left-3 before:right-3 before:top-0 before:h-px before:origin-left before:scale-x-0 before:rounded-full before:bg-sidebar-active/0 before:transition-[transform,background-color] before:duration-200";
+  const itemIdleClass =
+    "text-sidebar-foreground hover:bg-sidebar-hover/80 hover:text-sidebar-active-foreground hover:before:scale-x-100 hover:before:bg-sidebar-active/45";
+  const itemActiveClass =
+    "text-sidebar-active-foreground bg-sidebar-active/20 border-sidebar-active shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] before:scale-x-100 before:bg-sidebar-active/70";
+
   const toggleSubmenu = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };
@@ -85,7 +94,7 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "flex flex-col h-full min-h-0 bg-sidebar border-r border-sidebar-border transition-all duration-300 flex-shrink-0",
+        "flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 flex-shrink-0",
         collapsed ? "w-16" : "w-[260px]"
       )}
     >
@@ -105,7 +114,7 @@ export function AppSidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 min-h-0 overflow-y-auto overscroll-contain py-2 scrollbar-thin">
+      <nav className="flex-1 overflow-y-auto py-2 scrollbar-thin">
         {menuItems.map((item) => {
           if (item.children) {
             const isOpen = openMenus[item.label] || hasActiveChild(item.children);
@@ -114,8 +123,9 @@ export function AppSidebar() {
                 <button
                   onClick={() => !collapsed && toggleSubmenu(item.label)}
                   className={cn(
-                    "flex items-center w-full px-4 py-2.5 text-sm text-sidebar-foreground hover:bg-sidebar-hover transition-colors",
-                    hasActiveChild(item.children) && "text-sidebar-active-foreground"
+                    itemBaseClass,
+                    itemTopLineClass,
+                    hasActiveChild(item.children) ? itemActiveClass : itemIdleClass
                   )}
                   title={collapsed ? item.label : undefined}
                 >
@@ -137,10 +147,10 @@ export function AppSidebar() {
                         key={child.path}
                         to={child.path}
                         className={cn(
-                          "flex items-center px-4 py-2 text-sm transition-colors",
+                          "group relative flex items-center px-4 py-2 text-sm border-l-2 border-transparent rounded-md transition-[background-color,color,border-color,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sidebar-active/40 active:translate-y-px before:pointer-events-none before:absolute before:left-3 before:right-3 before:top-0 before:h-px before:origin-left before:scale-x-0 before:rounded-full before:bg-sidebar-active/0 before:transition-[transform,background-color] before:duration-200",
                           isActive(child.path)
-                            ? "text-sidebar-active-foreground bg-sidebar-active/15 border-l-2 border-sidebar-active -ml-px"
-                            : "text-sidebar-foreground hover:bg-sidebar-hover"
+                            ? "text-sidebar-active-foreground bg-sidebar-active/20 border-sidebar-active shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] before:scale-x-100 before:bg-sidebar-active/70"
+                            : "text-sidebar-foreground hover:bg-sidebar-hover/80 hover:text-sidebar-active-foreground hover:before:scale-x-100 hover:before:bg-sidebar-active/45"
                         )}
                       >
                         <child.icon size={14} className="flex-shrink-0" />
@@ -159,10 +169,11 @@ export function AppSidebar() {
               to={item.path!}
               end={item.path === "/"}
               className={cn(
-                "flex items-center px-4 py-2.5 text-sm transition-colors",
+                itemBaseClass,
+                itemTopLineClass,
                 isActive(item.path)
-                  ? "text-sidebar-active-foreground bg-sidebar-active/15 border-r-2 border-sidebar-active"
-                  : "text-sidebar-foreground hover:bg-sidebar-hover"
+                  ? itemActiveClass
+                  : itemIdleClass
               )}
               title={collapsed ? item.label : undefined}
             >

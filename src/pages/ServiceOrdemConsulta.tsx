@@ -79,7 +79,7 @@ export default function ServiceOrderConsulta() {
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground">Consultar O.S</h1>
+      <h1 className="text-2xl font-bold text-foreground">OS Consulta</h1>
 
       {/* Search bar */}
       <div className="flex items-center gap-2 justify-end">
