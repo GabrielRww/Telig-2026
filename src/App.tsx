@@ -13,7 +13,7 @@ const TJammerContrasenha = lazy(() => import("@/pages/TJammerContrasenha"));
 const Estoque            = lazy(() => import("@/pages/Estoque"));
 const ServiceOrderConsulta = lazy(() => import("@/pages/ServiceOrdemConsulta"));
 const Auditoria          = lazy(() => import("@/pages/Auditoria"));
-const Contasenha         = lazy(() => import("@/pages/ContaSenha"));
+const Contrasenha        = lazy(() => import("@/pages/ContaSenha"));
 const VeiculosConsulta   = lazy(() => import("@/pages/manutencoes/VeiculosConsulta"));
 const Pedidos            = lazy(() => import("@/pages/Pedidos"));
 const Empresas           = lazy(() => import("@/pages/Empresas"));
@@ -40,7 +40,7 @@ const App = () => (
         <Routes>
           <Route element={<AppLayout />}>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/contasenha" element={<Contasenha />} />
+            <Route path="/contasenha" element={<Contrasenha />} />
             <Route path="/tjammer" element={<TJammerContrasenha />} />
             <Route path="/auditoria" element={<Auditoria />} />
             <Route path="/veiculos-consulta" element={<VeiculosConsulta />} />

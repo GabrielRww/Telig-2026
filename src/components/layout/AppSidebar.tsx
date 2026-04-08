@@ -36,7 +36,7 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { label: "Dashboard", path: "/", icon: LayoutDashboard },
-  { label: "Contasenha", path: "/contasenha", icon: Shield },
+  { label: "Contrasenha", path: "/contasenha", icon: Shield },
   { label: "TJammer Contrasenha", path: "/tjammer", icon: Radio },
   { label: "Auditoria", path: "/auditoria", icon: ClipboardCheck },
   { label: "Consulta de Veículos", path: "/veiculos-consulta", icon: Car },

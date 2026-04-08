@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
-export default function Contasenha() {
+export default function Contrasenha() {
   const [senha, setSenha] = useState("");
   const [modelo, setModelo] = useState("");
   const [contrasenha, setContrasenha] = useState<string | null>(null);
@@ -34,13 +34,13 @@ export default function Contasenha() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground">Contasenha</h1>
+      <h1 className="text-2xl font-bold text-foreground">Contrasenha</h1>
 
       <Card className="border shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Shield size={18} className="text-primary" />
-            Gerar Contasenha de Desbloqueio
+            Gerar Contrasenha de Desbloqueio
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -71,12 +71,12 @@ export default function Contasenha() {
           </div>
 
           <Button onClick={handleGerar} className="w-full" disabled={!senha || !modelo}>
-            Gerar Contasenha
+            Gerar Contrasenha
           </Button>
 
           {contrasenha && (
             <div className="mt-4 p-6 bg-primary/5 border border-primary/20 rounded-lg text-center space-y-3">
-              <p className="text-sm text-muted-foreground">Contasenha gerada:</p>
+              <p className="text-sm text-muted-foreground">Contrasenha gerada:</p>
               <p className="text-3xl font-bold text-primary tracking-widest">{contrasenha}</p>
               <Button variant="outline" size="sm" className="gap-2" onClick={handleCopy}>
                 {copied ? <Check size={14} /> : <Copy size={14} />}

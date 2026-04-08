@@ -4,6 +4,7 @@ import {
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { EquipmentPieChart } from "@/components/dashboard/EquipmentPieChart";
+import { SystemAlerts } from "@/components/dashboard/SystemAlerts";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
@@ -66,6 +67,10 @@ const Dashboard = () => {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <SystemAlerts />
       </div>
     </div>
   );
