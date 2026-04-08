@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Eye, EyeOff, LogIn, Radio, Cpu, Zap } from "lucide-react";
+import { ShieldCheck, FileText, Cog, Gauge, Eye, EyeOff, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,10 +30,10 @@ export default function Login() {
   };
 
   const features = [
-    { icon: Shield, label: "Segurança", desc: "Controle total de acesso e auditoria" },
-    { icon: Radio, label: "TJammer", desc: "Integração com contrasenhas em tempo real" },
-    { icon: Cpu, label: "Automação", desc: "Transferências automáticas de equipamentos" },
-    { icon: Zap, label: "Performance", desc: "Gestão de 188k+ ordens de serviço" },
+    { icon: ShieldCheck, label: "Segurança", desc: "Controle total de acesso e auditoria" },
+    { icon: FileText, label: "Operação", desc: "Fluxo organizado para ordens e registros" },
+    { icon: Cog, label: "Automação", desc: "Processos e integrações mais consistentes" },
+    { icon: Gauge, label: "Performance", desc: "Gestão rápida mesmo em volume alto" },
   ];
 
   return (
@@ -74,7 +74,7 @@ export default function Login() {
             transition={{ delay: 0.3, duration: 0.5 }}
           >
             <h1 className="text-4xl font-bold tracking-tight text-white">
-              TELIG <span className="text-primary">:)</span>
+              TELIG
             </h1>
             <p className="text-sm text-white/40 mt-1 tracking-widest uppercase">Sistema de Gestão Operacional</p>
           </motion.div>
@@ -144,7 +144,7 @@ export default function Login() {
           {/* Mobile logo */}
           <div className="lg:hidden text-center">
             <h1 className="text-3xl font-bold text-foreground">
-              TELIG <span className="text-primary">:)</span>
+              TELIG
             </h1>
             <p className="text-sm text-muted-foreground mt-1">Sistema de Gestão Operacional</p>
           </div>
@@ -216,7 +216,7 @@ export default function Login() {
                     className="flex items-center gap-2"
                   >
                     <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
-                      <Cpu size={16} />
+                      <Cog size={16} />
                     </motion.div>
                     Entrando...
                   </motion.div>

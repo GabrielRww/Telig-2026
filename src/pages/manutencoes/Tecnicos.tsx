@@ -14,10 +14,12 @@ const mockTecnicos = [
 ];
 
 const statusColor: Record<string, string> = {
-  "Disponível": "bg-green-100 text-green-800",
-  "Em atendimento": "bg-yellow-100 text-yellow-800",
-  "Indisponível": "bg-red-100 text-red-800",
+  "Disponível": "border-slate-200 text-slate-700",
+  "Em atendimento": "border-amber-200 text-amber-700",
+  "Indisponível": "border-rose-200 text-rose-700",
 };
+
+const statusBadgeBase = "rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium tracking-wide shadow-none";
 
 export default function Tecnicos() {
   const [search, setSearch] = useState("");
@@ -46,7 +48,7 @@ export default function Tecnicos() {
                 <TableCell className="font-mono text-sm">{t.telefone}</TableCell>
                 <TableCell>{t.regiao}</TableCell>
                 <TableCell className="text-center"><Badge variant="secondary" className="font-mono">{t.osAtivas}</Badge></TableCell>
-                <TableCell><Badge variant="secondary" className={cn("text-xs", statusColor[t.status])}>{t.status}</Badge></TableCell>
+                <TableCell><Badge variant="outline" className={cn(statusBadgeBase, statusColor[t.status])}>{t.status}</Badge></TableCell>
                 <TableCell><Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Edit size={14} className="text-primary" /></Button></TableCell>
               </TableRow>
             ))}

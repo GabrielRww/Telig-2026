@@ -14,10 +14,12 @@ const mockPlacas = [
 ];
 
 const riscoColor: Record<string, string> = {
-  "Alto": "bg-red-100 text-red-800",
-  "Médio": "bg-yellow-100 text-yellow-800",
-  "Baixo": "bg-blue-100 text-blue-800",
+  "Alto": "border-rose-200 text-rose-700",
+  "Médio": "border-amber-200 text-amber-700",
+  "Baixo": "border-slate-200 text-slate-700",
 };
+
+const statusBadgeBase = "rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium tracking-wide shadow-none";
 
 export default function PlacasRetiradas() {
   return (
@@ -53,7 +55,7 @@ export default function PlacasRetiradas() {
                 <TableCell className="font-mono text-sm">{p.equipamento}</TableCell>
                 <TableCell>{p.ultimoSinal}</TableCell>
                 <TableCell className="text-center font-bold">{p.diasSemSinal}</TableCell>
-                <TableCell><Badge variant="secondary" className={cn("text-xs", riscoColor[p.risco])}>{p.risco}</Badge></TableCell>
+                <TableCell><Badge variant="outline" className={cn(statusBadgeBase, riscoColor[p.risco])}>{p.risco}</Badge></TableCell>
               </TableRow>
             ))}
           </TableBody>

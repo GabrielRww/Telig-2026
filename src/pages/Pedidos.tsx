@@ -17,12 +17,14 @@ const mockPedidos = [
 ];
 
 const statusColor: Record<string, string> = {
-  "Aberto": "bg-blue-100 text-blue-800",
-  "Em separação": "bg-yellow-100 text-yellow-800",
-  "Faturado": "bg-green-100 text-green-800",
-  "Entregue": "bg-emerald-100 text-emerald-800",
-  "Cancelado": "bg-red-100 text-red-800",
+  "Aberto": "border-slate-200 text-slate-700",
+  "Em separação": "border-amber-200 text-amber-700",
+  "Faturado": "border-slate-200 text-slate-700",
+  "Entregue": "border-emerald-200 text-emerald-700",
+  "Cancelado": "border-rose-200 text-rose-700",
 };
+
+const statusBadgeBase = "rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium tracking-wide shadow-none";
 
 export default function Pedidos() {
   const [search, setSearch] = useState("");
@@ -66,7 +68,7 @@ export default function Pedidos() {
                 <TableCell className="text-center">{p.itens}</TableCell>
                 <TableCell className="text-right font-medium">{p.total}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary" className={cn("text-xs", statusColor[p.status])}>{p.status}</Badge>
+                  <Badge variant="outline" className={cn(statusBadgeBase, statusColor[p.status])}>{p.status}</Badge>
                 </TableCell>
               </TableRow>
             ))}

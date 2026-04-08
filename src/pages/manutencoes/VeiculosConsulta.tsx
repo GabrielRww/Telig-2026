@@ -22,10 +22,12 @@ const mockVeiculos = [
 ];
 
 const statusEquipColor: Record<string, string> = {
-  "Equipado": "bg-green-100 text-green-800",
-  "Em Manutenção": "bg-yellow-100 text-yellow-800",
-  "Sem equipamento": "bg-red-100 text-red-800",
+  "Equipado": "border-slate-200 text-slate-700",
+  "Em Manutenção": "border-amber-200 text-amber-700",
+  "Sem equipamento": "border-rose-200 text-rose-700",
 };
+
+const statusBadgeBase = "rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium tracking-wide shadow-none";
 
 export default function VeiculosConsulta() {
   const [searchField, setSearchField] = useState("placa");
@@ -84,8 +86,13 @@ export default function VeiculosConsulta() {
               <>
                 <tr key={v.id} className={cn("border-b transition-colors", i % 2 === 0 ? "bg-card" : "bg-muted/20")}>
                   <td className="p-3">
-                    <Button variant="default" size="icon" className="h-7 w-7 rounded bg-primary hover:bg-primary/90" onClick={() => setExpandedRow(expandedRow === v.id ? null : v.id)}>
-                      {expandedRow === v.id ? <ChevronUp size={14} className="text-primary-foreground" /> : <ChevronDown size={14} className="text-primary-foreground" />}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8 rounded-lg border-border/70 bg-background text-primary shadow-sm hover:bg-primary hover:text-primary-foreground"
+                      onClick={() => setExpandedRow(expandedRow === v.id ? null : v.id)}
+                    >
+                      {expandedRow === v.id ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
                     </Button>
                   </td>
                   <td className="p-3 font-mono font-medium">{v.placa}</td>
@@ -94,7 +101,7 @@ export default function VeiculosConsulta() {
                   <td className="p-3">{v.cor}</td>
                   <td className="p-3">{v.cliente}</td>
                   <td className="p-3">
-                    <Badge variant="secondary" className={cn("text-xs", statusEquipColor[v.statusEquip])}>{v.statusEquip}</Badge>
+                    <Badge variant="outline" className={cn(statusBadgeBase, statusEquipColor[v.statusEquip])}>{v.statusEquip}</Badge>
                   </td>
                 </tr>
                 {expandedRow === v.id && (
@@ -124,7 +131,7 @@ export default function VeiculosConsulta() {
                                     <tr key={j} className="border-b last:border-0">
                                       <td className="p-2 font-mono">{eq.serial}</td>
                                       <td className="p-2">{eq.produto}</td>
-                                      <td className="p-2"><Badge variant="secondary" className="text-xs">{eq.status}</Badge></td>
+                                      <td className="p-2"><Badge variant="outline" className="rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium tracking-wide shadow-none">{eq.status}</Badge></td>
                                     </tr>
                                   ))}
                                 </tbody>

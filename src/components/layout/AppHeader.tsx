@@ -1,4 +1,4 @@
-import { LogOut, User, Bell } from "lucide-react";
+import { Bell, LogOut, UserRound } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -45,25 +45,29 @@ export function AppHeader() {
         <span className="text-border">/</span>
         <span className="text-foreground font-medium">{currentPage}</span>
       </div>
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" className="relative text-muted-foreground hover:text-foreground">
+      <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative h-9 w-9 rounded-full border border-border/70 bg-background text-muted-foreground shadow-sm hover:bg-muted/70 hover:text-foreground"
+        >
           <Bell size={16} />
           <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
         </Button>
-        <div className="h-5 w-px bg-border mx-1" />
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
-            <User size={14} className="text-primary" />
+        <div className="h-5 w-px bg-border/80" />
+        <div className="flex items-center gap-2 rounded-full border border-border/70 bg-background pl-1 pr-3 py-1 shadow-sm">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <UserRound size={14} />
           </div>
-          <span className="hidden sm:inline font-medium text-foreground/80">
+          <span className="hidden sm:inline text-sm font-medium text-foreground/80">
             {user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário"}
           </span>
         </div>
         <Button
           variant="ghost"
-          size="sm"
+          size="icon"
           onClick={signOut}
-          className="text-muted-foreground hover:text-destructive transition-colors"
+          className="h-9 w-9 rounded-full border border-border/70 bg-background text-muted-foreground shadow-sm hover:bg-destructive/10 hover:text-destructive transition-colors"
           title="Sair"
         >
           <LogOut size={16} />

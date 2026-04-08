@@ -6,8 +6,8 @@ import { AppHeader } from "./AppHeader";
 
 export function AppLayout() {
   return (
-    <SidebarProvider className="h-full overflow-hidden">
-      <div className="flex h-full w-full overflow-hidden">
+    <SidebarProvider className="h-screen overflow-hidden">
+      <div className="flex h-screen w-full overflow-hidden">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
           <AppHeader />

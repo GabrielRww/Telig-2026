@@ -16,10 +16,12 @@ const mockUsers = [
 ];
 
 const perfilColor: Record<string, string> = {
-  "Administrador": "bg-purple-100 text-purple-800",
-  "Atendente": "bg-blue-100 text-blue-800",
-  "Técnico": "bg-green-100 text-green-800",
+  "Administrador": "border-slate-200 text-slate-700",
+  "Atendente": "border-slate-200 text-slate-700",
+  "Técnico": "border-emerald-200 text-emerald-700",
 };
+
+const statusBadgeBase = "rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium tracking-wide shadow-none";
 
 export default function Usuarios() {
   const [search, setSearch] = useState("");
@@ -45,9 +47,16 @@ export default function Usuarios() {
               <TableRow key={u.id} className={cn(i % 2 === 0 && "bg-muted/20")}>
                 <TableCell className="font-medium">{u.nome}</TableCell>
                 <TableCell className="text-sm">{u.email}</TableCell>
-                <TableCell><Badge variant="secondary" className={cn("text-xs", perfilColor[u.perfil])}>{u.perfil}</Badge></TableCell>
+                <TableCell><Badge variant="outline" className={cn(statusBadgeBase, perfilColor[u.perfil])}>{u.perfil}</Badge></TableCell>
                 <TableCell>{u.empresa}</TableCell>
-                <TableCell><Badge variant="secondary" className={cn("text-xs", u.status === "Ativo" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")}>{u.status}</Badge></TableCell>
+                <TableCell>
+                  <Badge
+                    variant="outline"
+                    className={cn(statusBadgeBase, u.status === "Ativo" ? "border-emerald-200 text-emerald-700" : "border-rose-200 text-rose-700")}
+                  >
+                    {u.status}
+                  </Badge>
+                </TableCell>
                 <TableCell><Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Edit size={14} className="text-primary" /></Button></TableCell>
               </TableRow>
             ))}

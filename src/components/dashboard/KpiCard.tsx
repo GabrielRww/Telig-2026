@@ -10,36 +10,36 @@ interface KpiCardProps {
 }
 
 const colorMap = {
-  blue: "bg-kpi-blue/10 text-kpi-blue border-kpi-blue/20",
-  green: "bg-kpi-green/10 text-kpi-green border-kpi-green/20",
-  orange: "bg-kpi-orange/10 text-kpi-orange border-kpi-orange/20",
-  purple: "bg-kpi-purple/10 text-kpi-purple border-kpi-purple/20",
-  red: "bg-kpi-red/10 text-kpi-red border-kpi-red/20",
-  teal: "bg-kpi-teal/10 text-kpi-teal border-kpi-teal/20",
+  blue: "border-primary/15 bg-primary/5 text-primary",
+  green: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  orange: "border-amber-200 bg-amber-50 text-amber-700",
+  purple: "border-violet-200 bg-violet-50 text-violet-700",
+  red: "border-rose-200 bg-rose-50 text-rose-700",
+  teal: "border-cyan-200 bg-cyan-50 text-cyan-700",
 };
 
 const iconBgMap = {
-  blue: "bg-kpi-blue",
-  green: "bg-kpi-green",
-  orange: "bg-kpi-orange",
-  purple: "bg-kpi-purple",
-  red: "bg-kpi-red",
-  teal: "bg-kpi-teal",
+  blue: "border-primary/15 bg-primary/10 text-primary",
+  green: "border-emerald-200 bg-emerald-100 text-emerald-700",
+  orange: "border-amber-200 bg-amber-100 text-amber-700",
+  purple: "border-violet-200 bg-violet-100 text-violet-700",
+  red: "border-rose-200 bg-rose-100 text-rose-700",
+  teal: "border-cyan-200 bg-cyan-100 text-cyan-700",
 };
 
 export function KpiCard({ title, value, icon: Icon, color, description }: KpiCardProps) {
   return (
     <div className={cn(
-      "rounded-lg border p-4 flex items-start gap-4 animate-fade-in",
+      "rounded-xl border bg-card p-4 flex items-start gap-4 shadow-sm animate-fade-in",
       colorMap[color]
     )}>
-      <div className={cn("rounded-lg p-2.5 text-primary-foreground shrink-0", iconBgMap[color])}>
+      <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl border shrink-0", iconBgMap[color])}>
         <Icon className="h-5 w-5" />
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-medium opacity-80">{title}</p>
-        <p className="text-2xl font-bold animate-count-up">{value}</p>
-        {description && <p className="text-xs opacity-60 mt-0.5">{description}</p>}
+        <p className="text-sm font-medium text-foreground/70">{title}</p>
+        <p className="text-2xl font-semibold tracking-tight text-foreground animate-count-up">{value}</p>
+        {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
       </div>
     </div>
   );

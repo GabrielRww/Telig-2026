@@ -74,6 +74,16 @@
 }
 
 @layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  html {
+    background: hsl(var(--background));
+  }
+
   * {
     @apply border-border;
   }
@@ -83,10 +93,17 @@
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 }
 
 @layer utilities {
+  svg.lucide {
+    stroke-width: 1.85;
+    shape-rendering: geometricPrecision;
+  }
+
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--sidebar-hover)) transparent;

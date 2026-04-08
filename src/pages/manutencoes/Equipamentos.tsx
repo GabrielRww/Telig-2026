@@ -21,11 +21,13 @@ const mockEquipamentos = [
 ];
 
 const statusColor: Record<string, string> = {
-  "Instalado": "bg-green-100 text-green-800",
-  "Em Manutenção": "bg-yellow-100 text-yellow-800",
-  "Em estoque": "bg-blue-100 text-blue-800",
-  "Retirado": "bg-gray-100 text-gray-800",
+  "Instalado": "border-slate-200 text-slate-700",
+  "Em Manutenção": "border-amber-200 text-amber-700",
+  "Em estoque": "border-slate-200 text-slate-700",
+  "Retirado": "border-rose-200 text-rose-700",
 };
+
+const statusBadgeBase = "rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium tracking-wide shadow-none";
 
 export default function Equipamentos() {
   const [search, setSearch] = useState("");
@@ -72,7 +74,7 @@ export default function Equipamentos() {
                 <TableCell>{e.cliente}</TableCell>
                 <TableCell className="font-mono">{e.veiculo}</TableCell>
                 <TableCell>{e.dataInstalacao}</TableCell>
-                <TableCell><Badge variant="secondary" className={cn("text-xs", statusColor[e.status])}>{e.status}</Badge></TableCell>
+                <TableCell><Badge variant="outline" className={cn(statusBadgeBase, statusColor[e.status])}>{e.status}</Badge></TableCell>
                 <TableCell><Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Edit size={14} className="text-primary" /></Button></TableCell>
               </TableRow>
             ))}

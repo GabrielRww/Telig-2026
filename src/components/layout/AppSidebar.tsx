@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, Shield, Radio, ClipboardCheck, Car, Package,
+  LayoutDashboard, ShieldCheck, ClipboardCheck, Car, Package,
   ClipboardList, FileSearch, ShoppingCart, Settings, BarChart3, Users,
   ChevronDown, ChevronLeft, ChevronRight, Building2, UserCog, Tag,
   Box, Cpu, CarFront, FileText,
@@ -19,8 +19,8 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { label: "Dashboard", path: "/", icon: LayoutDashboard },
-  { label: "Contasenha", path: "/contasenha", icon: Shield },
-  { label: "TJammer", path: "/tjammer", icon: Radio },
+  { label: "Contasenha", path: "/contasenha", icon: ShieldCheck },
+  { label: "TJammer", path: "/tjammer", icon: ShieldCheck },
   { label: "Auditoria", path: "/auditoria", icon: ClipboardCheck },
   { label: "Consulta Veículos", path: "/veiculos-consulta", icon: Car },
   { label: "Estoque", path: "/estoque", icon: Package },
@@ -73,20 +73,22 @@ export function AppSidebar() {
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between h-14 px-4 border-b border-sidebar-border"
-        style={{ background: "hsl(var(--sidebar-header))" }}>
+      <div
+        className="flex items-center justify-between h-14 px-4 border-b border-sidebar-border"
+        style={{ background: "hsl(var(--sidebar-header))" }}
+      >
         {!collapsed && (
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-lg font-bold text-white tracking-wide"
+            className="text-sm font-semibold tracking-[0.28em] text-white"
           >
-            TELIG <span className="text-primary">:)</span>
+            TELIG
           </motion.span>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-hover hover:text-white transition-all duration-200"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-sidebar-border bg-sidebar-hover text-sidebar-foreground/90 shadow-sm transition-all duration-200 hover:bg-primary hover:text-white"
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
@@ -97,19 +99,30 @@ export function AppSidebar() {
         {menuItems.map((item, idx) => {
           if (item.children) {
             const isOpen = openMenus[item.label] || hasActiveChild(item.children);
+            const activeChild = hasActiveChild(item.children);
             return (
               <div key={item.label}>
                 <button
                   onClick={() => !collapsed && toggleSubmenu(item.label)}
                   className={cn(
-                    "flex items-center w-full px-3 py-2 text-sm rounded-lg transition-all duration-200",
-                    hasActiveChild(item.children)
+                    "group flex items-center w-full py-2 text-sm rounded-lg transition-all duration-200",
+                    collapsed ? "justify-center px-2" : "px-3",
+                    activeChild
                       ? "text-white bg-sidebar-hover"
                       : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-white"
                   )}
                   title={collapsed ? item.label : undefined}
                 >
-                  <item.icon size={18} className="flex-shrink-0" />
+                  <span
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-lg border transition-all duration-200 shrink-0",
+                      activeChild
+                        ? "border-primary/20 bg-primary/10 text-primary"
+                        : "border-sidebar-border/80 bg-sidebar-header/70 text-sidebar-foreground/80 group-hover:border-sidebar-hover group-hover:bg-sidebar-hover group-hover:text-white"
+                    )}
+                  >
+                    <item.icon size={16} className="flex-shrink-0" />
+                  </span>
                   {!collapsed && (
                     <>
                       <span className="ml-3 flex-1 text-left truncate">{item.label}</span>
@@ -133,13 +146,23 @@ export function AppSidebar() {
                           key={child.path}
                           to={child.path}
                           className={cn(
-                            "flex items-center px-3 py-1.5 text-sm rounded-lg transition-all duration-200 my-0.5",
+                            "group flex items-center py-1.5 text-sm rounded-lg transition-all duration-200 my-0.5",
+                            collapsed ? "justify-center px-2" : "px-3",
                             isActive(child.path)
                               ? "text-white bg-primary/20 font-medium"
                               : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-white"
                           )}
                         >
-                          <child.icon size={14} className="flex-shrink-0" />
+                          <span
+                            className={cn(
+                              "flex h-7 w-7 items-center justify-center rounded-md border transition-all duration-200 shrink-0",
+                              isActive(child.path)
+                                ? "border-primary/20 bg-primary/10 text-primary"
+                                : "border-sidebar-border/80 bg-sidebar-header/70 text-sidebar-foreground/80 group-hover:border-sidebar-hover group-hover:bg-sidebar-hover group-hover:text-white"
+                            )}
+                          >
+                            <child.icon size={13} className="flex-shrink-0" />
+                          </span>
                           <span className="ml-2.5 truncate">{child.label}</span>
                           {isActive(child.path) && (
                             <motion.div
@@ -162,14 +185,24 @@ export function AppSidebar() {
               to={item.path!}
               end={item.path === "/"}
               className={cn(
-                "flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200",
+                "group flex items-center py-2 text-sm rounded-lg transition-all duration-200",
+                collapsed ? "justify-center px-2" : "px-3",
                 isActive(item.path)
                   ? "text-white bg-primary/20 font-medium"
                   : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-white"
               )}
               title={collapsed ? item.label : undefined}
             >
-              <item.icon size={18} className="flex-shrink-0" />
+              <span
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-lg border transition-all duration-200 shrink-0",
+                  isActive(item.path)
+                    ? "border-primary/20 bg-primary/10 text-primary"
+                    : "border-sidebar-border/80 bg-sidebar-header/70 text-sidebar-foreground/80 group-hover:border-sidebar-hover group-hover:bg-sidebar-hover group-hover:text-white"
+                )}
+              >
+                <item.icon size={16} className="flex-shrink-0" />
+              </span>
               {!collapsed && <span className="ml-3 truncate">{item.label}</span>}
               {!collapsed && isActive(item.path) && (
                 <motion.div

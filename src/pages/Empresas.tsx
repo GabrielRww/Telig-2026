@@ -14,6 +14,8 @@ const mockEmpresas = [
   { id: 5, nome: "FleetShield", cnpj: "56.789.012/0001-34", cidade: "Erechim/RS", contato: "(54) 3321-7890", email: "contato@fleetshield.com.br", status: "Ativa" },
 ];
 
+const statusBadgeBase = "rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium tracking-wide shadow-none";
+
 export default function Empresas() {
   const [search, setSearch] = useState("");
   const filtered = mockEmpresas.filter((e) => !search || e.nome.toLowerCase().includes(search.toLowerCase()) || e.cnpj.includes(search));
@@ -40,7 +42,14 @@ export default function Empresas() {
                 <TableCell className="font-mono text-sm">{e.cnpj}</TableCell>
                 <TableCell>{e.cidade}</TableCell>
                 <TableCell>{e.contato}</TableCell>
-                <TableCell><Badge variant="secondary" className={cn("text-xs", e.status === "Ativa" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")}>{e.status}</Badge></TableCell>
+                <TableCell>
+                  <Badge
+                    variant="outline"
+                    className={cn(statusBadgeBase, e.status === "Ativa" ? "border-emerald-200 text-emerald-700" : "border-rose-200 text-rose-700")}
+                  >
+                    {e.status}
+                  </Badge>
+                </TableCell>
                 <TableCell><Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Edit size={14} className="text-primary" /></Button></TableCell>
               </TableRow>
             ))}

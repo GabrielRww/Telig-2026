@@ -19,6 +19,8 @@ export default function Produtos() {
   const [search, setSearch] = useState("");
   const filtered = mockProdutos.filter((p) => !search || p.nome.toLowerCase().includes(search.toLowerCase()) || p.codigo.toLowerCase().includes(search.toLowerCase()));
 
+  const statusBadgeBase = "rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium tracking-wide shadow-none";
+
   return (
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
@@ -41,8 +43,22 @@ export default function Produtos() {
                 <TableCell className="font-medium">{p.nome}</TableCell>
                 <TableCell>{p.categoria}</TableCell>
                 <TableCell className="text-right font-mono">{p.preco}</TableCell>
-                <TableCell className="text-center"><Badge variant="secondary" className={cn("font-mono", p.estoque === 0 && "bg-red-100 text-red-800")}>{p.estoque}</Badge></TableCell>
-                <TableCell><Badge variant="secondary" className={cn("text-xs", p.status === "Ativo" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800")}>{p.status}</Badge></TableCell>
+                <TableCell className="text-center">
+                  <Badge
+                    variant="outline"
+                    className={cn(statusBadgeBase, "font-mono", p.estoque === 0 ? "border-rose-200 text-rose-700" : "border-border/70 text-foreground/75")}
+                  >
+                    {p.estoque}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant="outline"
+                    className={cn(statusBadgeBase, p.status === "Ativo" ? "border-emerald-200 text-emerald-700" : "border-slate-200 text-slate-700")}
+                  >
+                    {p.status}
+                  </Badge>
+                </TableCell>
                 <TableCell><Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Edit size={14} className="text-primary" /></Button></TableCell>
               </TableRow>
             ))}
