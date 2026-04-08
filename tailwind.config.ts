@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -15,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["IBM Plex Sans", "system-ui", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -60,31 +59,22 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
+          DEFAULT: "hsl(var(--sidebar-bg))",
+          foreground: "hsl(var(--sidebar-fg))",
+          hover: "hsl(var(--sidebar-hover))",
+          active: "hsl(var(--sidebar-active))",
+          "active-foreground": "hsl(var(--sidebar-active-fg))",
+          border: "hsl(var(--sidebar-border))",
+          header: "hsl(var(--sidebar-header))",
           primary: "hsl(var(--sidebar-primary))",
           "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
           accent: "hsl(var(--sidebar-accent))",
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
-          muted: "hsl(var(--sidebar-muted))",
-          header: "hsl(var(--sidebar-header))",
-          hover: "hsl(var(--sidebar-hover))",
-          active: "hsl(var(--sidebar-active))",
-          "active-foreground": "hsl(var(--sidebar-active-foreground))",
         },
         header: {
-          DEFAULT: "hsl(var(--header-background))",
-          foreground: "hsl(var(--header-foreground))",
-        },
-        kpi: {
-          blue: "hsl(var(--kpi-blue))",
-          green: "hsl(var(--kpi-green))",
-          orange: "hsl(var(--kpi-orange))",
-          purple: "hsl(var(--kpi-purple))",
-          red: "hsl(var(--kpi-red))",
-          teal: "hsl(var(--kpi-teal))",
+          DEFAULT: "hsl(var(--header-bg))",
+          foreground: "hsl(var(--header-fg))",
         },
       },
       borderRadius: {
@@ -102,21 +92,16 @@ export default {
           to: { height: "0" },
         },
         "fade-in": {
-          from: { opacity: "0", transform: "translateY(3px)" },
+          from: { opacity: "0", transform: "translateY(4px)" },
           to: { opacity: "1", transform: "translateY(0)" },
-        },
-        "count-up": {
-          from: { opacity: "0", transform: "scale(0.8)" },
-          to: { opacity: "1", transform: "scale(1)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.2s ease-out forwards",
-        "count-up": "count-up 0.25s ease-out forwards",
+        "fade-in": "fade-in 0.3s ease-out",
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config;
