@@ -38,7 +38,6 @@ const menuItems: MenuItem[] = [
       { label: "Produtos", path: "/manutencoes/produtos", icon: Box },
       { label: "Equipamentos", path: "/manutencoes/equipamentos", icon: Cpu },
       { label: "Veículos", path: "/manutencoes/veiculos", icon: CarFront },
-      { label: "Modelos Veículos", path: "/manutencoes/modelos-veiculos", icon: Car },
     ],
   },
   {

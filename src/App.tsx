@@ -23,7 +23,6 @@ import CategoriasTecnicos from "@/pages/manutencoes/CategoriasTecnicos";
 import Produtos from "@/pages/manutencoes/Produtos";
 import Equipamentos from "@/pages/manutencoes/Equipamentos";
 import Veiculos from "@/pages/manutencoes/Veiculos";
-import ModelosVeiculos from "@/pages/manutencoes/ModelosVeiculo";
 import RelatorioOrdens from "@/pages/relatorios/RelatorioOrdens";
 import PlacasRetiradas from "@/pages/relatorios/PlacasRetiradas";
 import UsuariosSistema from "@/pages/UsuariosSistema";
@@ -57,7 +56,6 @@ const App = () => (
               <Route path="/manutencoes/produtos" element={<Produtos />} />
               <Route path="/manutencoes/equipamentos" element={<Equipamentos />} />
               <Route path="/manutencoes/veiculos" element={<Veiculos />} />
-              <Route path="/manutencoes/modelos-veiculos" element={<ModelosVeiculos />} />
               <Route path="/relatorios/ordens" element={<RelatorioOrdens />} />
               <Route path="/relatorios/placas-retiradas" element={<PlacasRetiradas />} />
               <Route path="/usuarios" element={<UsuariosSistema />} />

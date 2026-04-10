@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils";
+import { useMemo } from "react";
+import { useServiceOrders } from "@/data/service-orders";
 
 type AlertTone = "amber" | "red" | "blue";
 
@@ -7,24 +9,6 @@ interface SystemAlert {
   description: string;
   tone: AlertTone;
 }
-
-const alerts: SystemAlert[] = [
-  {
-    title: "12 veículos com possível retirada não registrada",
-    description: "Veículos sem equipamento ativo detectados automaticamente",
-    tone: "amber",
-  },
-  {
-    title: "3 OS em agendamento há mais de 7 dias",
-    description: "Ordens de serviço aguardando designação de técnico",
-    tone: "red",
-  },
-  {
-    title: "5 equipamentos com manutenção preventiva pendente",
-    description: "Verificar agendamento junto aos técnicos responsáveis",
-    tone: "blue",
-  },
-];
 
 const toneStyles: Record<AlertTone, { wrapper: string; dot: string }> = {
   amber: {
@@ -42,6 +26,50 @@ const toneStyles: Record<AlertTone, { wrapper: string; dot: string }> = {
 };
 
 export function SystemAlerts() {
+  const orders = useServiceOrders();
+
+  const alerts = useMemo<SystemAlert[]>(() => {
+    const waitingScheduling = orders.filter((order) => order.status === "Aguardando agendamento").length;
+    const waitingReschedule = orders.filter((order) => order.agendamentoStatus === "AGUARDANDO REAGENDAMENTO" || order.status === "Em reagendamento").length;
+    const billingPending = orders.filter((order) => !order.valorTecnico || !order.valorCliente).length;
+
+    const nextAlerts: SystemAlert[] = [];
+
+    if (waitingScheduling > 0) {
+      nextAlerts.push({
+        title: `${waitingScheduling} OS aguardando agendamento`,
+        description: "Ordens pendentes de definição de data e hora",
+        tone: "amber",
+      });
+    }
+
+    if (waitingReschedule > 0) {
+      nextAlerts.push({
+        title: `${waitingReschedule} OS em reagendamento`,
+        description: "Verificar retorno com cliente e nova disponibilidade",
+        tone: "red",
+      });
+    }
+
+    if (billingPending > 0) {
+      nextAlerts.push({
+        title: `${billingPending} OS sem valores completos`,
+        description: "Controladoria precisa preencher valor técnico e valor cliente",
+        tone: "blue",
+      });
+    }
+
+    if (nextAlerts.length === 0) {
+      nextAlerts.push({
+        title: "Operação em dia",
+        description: "Não há pendências críticas de agendamento ou faturamento no momento",
+        tone: "blue",
+      });
+    }
+
+    return nextAlerts;
+  }, [orders]);
+
   return (
     <section className="w-full max-w-[560px] rounded-lg border bg-card p-5 shadow-sm animate-fade-in">
       <h3 className="mb-5 text-lg font-semibold text-card-foreground">Alertas do Sistema</h3>

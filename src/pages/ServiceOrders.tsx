@@ -1,144 +1,234 @@
-import { useState } from "react";
-import { Breadcrumb } from "@/components/layout/Breadcrumb";
+import { useMemo, useState } from "react";
+import { Search, Filter, PencilLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import NewServiceOrderDialog from "@/components/service-orders/NewServiceOrderDialog";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import {
+  normalizeServiceOrderSearch,
+  serviceOrderStatusColorMap,
+  serviceOrderStatusOptions,
+  serviceOrderTypeLabels,
+  useServiceOrders,
+} from "@/data/service-orders";
 
-const STATUS_TABS = [
-  { label: "Em agendamento", count: 45 },
-  { label: "Em reagendamento", count: 12 },
-  { label: "Agendada", count: 89 },
-  { label: "Em Atendimento", count: 23 },
-  { label: "Em Execução", count: 34 },
-  { label: "Finalizada", count: 156 },
-  { label: "Validada", count: 78 },
-  { label: "Estoque", count: 15 },
-  { label: "Faturada", count: 1203 },
-  { label: "Cancelada", count: 42 },
-];
+export default function ServiceOrders() {
+  const [activeTab, setActiveTab] = useState("all");
+  const [search, setSearch] = useState("");
+  const [selectedType, setSelectedType] = useState("all");
+  const orders = useServiceOrders();
 
-const MOCK_OS = Array.from({ length: 10 }, (_, i) => ({
-  id: 188432 - i,
-  pedido: `PED-${2024000 + i}`,
-  tipo: ["INSTALAÇÃO", "RETIRADA", "MANUTENÇÃO", "REINSTALAÇÃO"][i % 4],
-  tecnico: ["Carlos Silva", "Roberto Lima", "Ana Costa", "Pedro Santos"][i % 4],
-  veiculo: `ABC-${1000 + i}`,
-  cliente: ["GolSat", "Tracker BR", "Volvo Seg.", "Scania Mon."][i % 4],
-  empresaFat: ["GolSat Rastreamento", "Tracker do Brasil", "Volvo Segurança", "Scania Mon."][i % 4],
-  abertura: new Date(2024, 11, 20 - i).toLocaleDateString("pt-BR"),
-  realizacao: i < 5 ? new Date(2024, 11, 21 - i).toLocaleDateString("pt-BR") : "—",
-  total: `R$ ${(Math.random() * 500 + 100).toFixed(2)}`,
-}));
+  const statusTabs = useMemo(() => {
+    const countsByStatus = orders.reduce<Record<string, number>>((accumulator, order) => {
+      accumulator[order.status] = (accumulator[order.status] ?? 0) + 1;
+      return accumulator;
+    }, {});
 
-const ServiceOrders = () => {
-  const [activeTab, setActiveTab] = useState("Agendada");
-  const [searchField, setSearchField] = useState("id");
+    return [
+      { key: "all", label: "Todas", count: orders.length },
+      ...serviceOrderStatusOptions.map((option) => ({
+        key: option.value,
+        label: option.label,
+        count: countsByStatus[option.value] ?? 0,
+      })),
+    ];
+  }, [orders]);
+
+  const filteredOrders = useMemo(() => {
+    const normalizedSearch = normalizeServiceOrderSearch(search);
+
+    return orders.filter((order) => {
+      if (activeTab !== "all" && order.status !== activeTab) {
+        return false;
+      }
+
+      if (selectedType !== "all" && order.tipo !== selectedType) {
+        return false;
+      }
+
+      if (!normalizedSearch) {
+        return true;
+      }
+
+      const searchTarget = normalizeServiceOrderSearch(
+        [
+          order.id,
+          order.pedido,
+          order.tipo,
+          serviceOrderTypeLabels[order.tipo] ?? order.tipo,
+          order.tecnico,
+          order.veiculo,
+          order.cliente,
+          order.empresa,
+          order.abertura,
+          order.realizacao,
+          order.total,
+          order.valorTecnico,
+          order.valorCliente,
+          order.status,
+          order.agendamentoStatus,
+          order.agendamentoData,
+          order.agendamentoHora,
+          order.agendamentoObservacao,
+        ].join(" ")
+      );
+
+      return searchTarget.includes(normalizedSearch);
+    });
+  }, [activeTab, orders, search, selectedType]);
 
   return (
-    <div>
-      <Breadcrumb items={[{ label: "Ordem de Serviço" }]} />
-
-      <div className="flex items-center justify-between mb-4">
+    <div className="space-y-4 animate-fade-in">
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Ordens de Serviço</h1>
-        <Button variant="success" className="gap-2">
-          <Plus className="h-4 w-4" />
-          Incluir
-        </Button>
+        <NewServiceOrderDialog />
       </div>
 
       {/* Status Tabs */}
-      <div className="flex flex-wrap gap-1 mb-4 border-b border-border pb-px">
-        {STATUS_TABS.map((tab) => (
+      <div className="flex gap-1 overflow-x-auto pb-2">
+        {statusTabs.map((tab) => (
           <button
-            key={tab.label}
-            onClick={() => setActiveTab(tab.label)}
-            className={`px-3 py-2 text-xs font-medium rounded-t-md transition-colors border-b-2 ${
-              activeTab === tab.label
-                ? "border-primary text-primary bg-primary/5"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
-            }`}
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-colors",
+              activeTab === tab.key
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-accent"
+            )}
           >
             {tab.label}
-            <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px]">
-              {tab.count}
+            <span className={cn(
+              "text-[10px] px-1.5 py-0.5 rounded-full",
+              activeTab === tab.key ? "bg-primary-foreground/20" : "bg-foreground/10"
+            )}>
+              {tab.count.toLocaleString()}
             </span>
           </button>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3 mb-4">
-        <Select value={searchField} onValueChange={setSearchField}>
-          <SelectTrigger className="w-40">
-            <SelectValue />
+      <div className="flex gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[240px]">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por ID, pedido, placa, técnico, cliente..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={selectedType} onValueChange={setSelectedType}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Tipo OS" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="id">ID</SelectItem>
-            <SelectItem value="pedido">Pedido</SelectItem>
-            <SelectItem value="tipo">Tipo</SelectItem>
-            <SelectItem value="tecnico">Técnico</SelectItem>
-            <SelectItem value="veiculo">Veículo</SelectItem>
-            <SelectItem value="cliente">Cliente</SelectItem>
-            <SelectItem value="serial">Equip. Serial</SelectItem>
+            <SelectItem value="all">Todos</SelectItem>
+            {Object.entries(serviceOrderTypeLabels).map(([value, label]) => (
+              <SelectItem key={value} value={value}>{label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Buscar..." className="pl-9" />
-        </div>
-        <Button variant="default" size="sm">
-          Filtrar
+        <Button variant="outline" size="default" className="gap-2">
+          <Filter size={14} />
+          Filtros
         </Button>
       </div>
 
       {/* Table */}
-      <div className="bg-card rounded-lg border overflow-hidden">
+      <Card className="border shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-striped">
-            <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="text-left p-3 font-medium text-muted-foreground">ID</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Pedido</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Tipo</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Técnico</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Veículo</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Cliente</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Emp. Faturamento</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Abertura</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Realização</th>
-                <th className="text-right p-3 font-medium text-muted-foreground">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MOCK_OS.map((os) => (
-                <tr key={os.id} className="border-b border-border/50 cursor-pointer">
-                  <td className="p-3 font-mono font-medium text-primary">#{os.id}</td>
-                  <td className="p-3">{os.pedido}</td>
-                  <td className="p-3">
-                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
-                      {os.tipo}
-                    </span>
-                  </td>
-                  <td className="p-3">{os.tecnico}</td>
-                  <td className="p-3 font-mono">{os.veiculo}</td>
-                  <td className="p-3">{os.cliente}</td>
-                  <td className="p-3 text-muted-foreground">{os.empresaFat}</td>
-                  <td className="p-3">{os.abertura}</td>
-                  <td className="p-3">{os.realizacao}</td>
-                  <td className="p-3 text-right font-medium">{os.total}</td>
-                </tr>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                <TableHead className="w-[70px]">ID</TableHead>
+                <TableHead>Pedido</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Técnico</TableHead>
+                <TableHead>Veículo</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Emp. Faturamento</TableHead>
+                <TableHead>Abertura</TableHead>
+                <TableHead>Realização</TableHead>
+                <TableHead className="text-right">Valor Técnico</TableHead>
+                <TableHead className="text-right">Valor Cliente</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredOrders.map((order, i) => (
+                <TableRow
+                  key={order.id}
+                  className={cn(
+                    "cursor-pointer hover:bg-muted/50 transition-colors",
+                    i % 2 === 0 && "bg-muted/20"
+                  )}
+                >
+                  <TableCell className="font-mono text-sm font-medium">{order.id}</TableCell>
+                  <TableCell className="text-sm">{order.pedido}</TableCell>
+                  <TableCell>
+                    <span className="text-sm">{serviceOrderTypeLabels[order.tipo] || order.tipo}</span>
+                  </TableCell>
+                  <TableCell className="text-sm">{order.tecnico}</TableCell>
+                  <TableCell className="font-mono text-sm">{order.veiculo}</TableCell>
+                  <TableCell className="text-sm">{order.cliente}</TableCell>
+                  <TableCell className="text-sm">{order.empresa}</TableCell>
+                  <TableCell className="text-sm">{order.abertura}</TableCell>
+                  <TableCell className="text-sm">{order.realizacao}</TableCell>
+                  <TableCell className="text-right text-sm font-medium">{order.valorTecnico || "-"}</TableCell>
+                  <TableCell className="text-right text-sm font-medium">{order.valorCliente || "-"}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="secondary"
+                      className={cn("text-xs font-medium", serviceOrderStatusColorMap[order.status])}
+                    >
+                      {order.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <NewServiceOrderDialog
+                      order={order}
+                      trigger={(
+                        <Button variant="outline" size="icon" className="h-8 w-8">
+                          <PencilLine size={14} />
+                        </Button>
+                      )}
+                    />
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between px-4 py-3 border-t bg-muted/30">
+        <div className="flex items-center justify-between px-4 py-3 border-t">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Exibir</span>
+            <span>
+              Exibindo {filteredOrders.length === 0 ? 0 : 1}
+              {filteredOrders.length > 0 ? `-${Math.min(filteredOrders.length, 10)}` : ""}
+              {" "}de {filteredOrders.length}
+            </span>
             <Select defaultValue="10">
-              <SelectTrigger className="w-16 h-8">
+              <SelectTrigger className="w-[80px] h-8">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -149,19 +239,17 @@ const ServiceOrders = () => {
             </Select>
             <span>por página</span>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="text-sm text-muted-foreground mr-3">1-10 de 89</span>
-            <Button variant="outline" size="icon" className="h-8 w-8">
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon" className="h-8 w-8">
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          <div className="flex gap-1">
+            <Button variant="outline" size="sm" disabled>Anterior</Button>
+            <Button variant="outline" size="sm" className="bg-primary text-primary-foreground">1</Button>
+            <Button variant="outline" size="sm">Próxima</Button>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
-};
+}
 
-export default ServiceOrders;
+function Card({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("bg-card rounded-lg", className)} {...props}>{children}</div>;
+}

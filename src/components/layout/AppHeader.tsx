@@ -21,7 +21,6 @@ const breadcrumbMap: Record<string, string> = {
   "/manutencoes/produtos": "Manutenções / Produtos",
   "/manutencoes/equipamentos": "Manutenções / Equipamentos",
   "/manutencoes/veiculos": "Manutenções / Veículos",
-  "/manutencoes/modelos-veiculos": "Manutenções / Modelos de Veículos",
   "/relatorios/ordens": "Relatórios / Ordens de Serviço",
   "/relatorios/placas-retiradas": "Relatórios / Placas Retiradas",
   "/usuarios": "Usuários do Sistema",

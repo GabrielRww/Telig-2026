@@ -11,15 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-
-const mockVeiculos = [
-  { id: 1, placa: "ABC1234", modelo: "Fiat Strada", ano: 2023, cor: "Branca", cliente: "Volare Segurança", equipamentos: [{ serial: "TJ-2024-001", produto: "TJammer 4G", status: "Ativo" }, { serial: "TB-2024-010", produto: "TBlock Pro", status: "Ativo" }], ultimaOS: 188432, statusEquip: "Equipado" },
-  { id: 2, placa: "XYZ5678", modelo: "VW Gol", ano: 2022, cor: "Prata", cliente: "Tracker Brasil", equipamentos: [{ serial: "TJ-2023-145", produto: "TBlock", status: "Ativo" }], ultimaOS: 188431, statusEquip: "Equipado" },
-  { id: 3, placa: "DEF9012", modelo: "Toyota Hilux", ano: 2024, cor: "Preta", cliente: "LogSafe", equipamentos: [{ serial: "TJ-2023-089", produto: "Rastreador 4G", status: "Manutenção" }], ultimaOS: 188430, statusEquip: "Em Manutenção" },
-  { id: 4, placa: "GHI3456", modelo: "Chevrolet S10", ano: 2023, cor: "Vermelha", cliente: "TransGuarda", equipamentos: [], ultimaOS: 188429, statusEquip: "Sem equipamento" },
-  { id: 5, placa: "JKL7890", modelo: "Ford Ranger", ano: 2024, cor: "Azul", cliente: "FleetShield", equipamentos: [{ serial: "TJ-2024-055", produto: "TBlock", status: "Ativo" }, { serial: "TJ-2024-056", produto: "Rastreador 4G", status: "Ativo" }], ultimaOS: 188428, statusEquip: "Equipado" },
-  { id: 6, placa: "MNO1234", modelo: "Fiat Toro", ano: 2022, cor: "Cinza", cliente: "Volare Segurança", equipamentos: [{ serial: "TJ-2022-200", produto: "TJammer 4G", status: "Ativo" }], ultimaOS: 188427, statusEquip: "Equipado" },
-];
+import { normalizeVehicleSearch, useRegisteredVehicles } from "@/data/veiculos";
 
 const statusEquipColor: Record<string, string> = {
   "Equipado": "border-slate-200 text-slate-700",
@@ -33,15 +25,17 @@ export default function VeiculosConsulta() {
   const [searchField, setSearchField] = useState("placa");
   const [searchValue, setSearchValue] = useState("");
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const vehicles = useRegisteredVehicles();
 
-  const filtered = mockVeiculos.filter((v) => {
+  const filtered = vehicles.filter((v) => {
     if (!searchValue) return true;
-    const val = searchValue.toLowerCase();
+    const val = normalizeVehicleSearch(searchValue);
     switch (searchField) {
-      case "placa": return v.placa.toLowerCase().includes(val);
-      case "modelo": return v.modelo.toLowerCase().includes(val);
-      case "cliente": return v.cliente.toLowerCase().includes(val);
-      case "serial": return v.equipamentos.some(e => e.serial.toLowerCase().includes(val));
+      case "placa": return normalizeVehicleSearch(v.placa).includes(val);
+      case "tipo": return normalizeVehicleSearch(v.tipo).includes(val);
+      case "modelo": return normalizeVehicleSearch(v.modelo).includes(val);
+      case "empresa": return normalizeVehicleSearch(v.empresa).includes(val);
+      case "serial": return v.equipamentos.some((e) => normalizeVehicleSearch(e.serial).includes(val));
       default: return true;
     }
   });
@@ -57,8 +51,9 @@ export default function VeiculosConsulta() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="placa">Placa</SelectItem>
+            <SelectItem value="tipo">Tipo</SelectItem>
             <SelectItem value="modelo">Modelo</SelectItem>
-            <SelectItem value="cliente">Cliente</SelectItem>
+            <SelectItem value="empresa">Empresa</SelectItem>
             <SelectItem value="serial">Serial Equip.</SelectItem>
           </SelectContent>
         </Select>
@@ -74,10 +69,11 @@ export default function VeiculosConsulta() {
             <tr className="bg-muted/50 border-b">
               <th className="w-[50px] p-3"></th>
               <th className="p-3 text-left font-semibold text-primary">PLACA</th>
+              <th className="p-3 text-left font-semibold text-primary">TIPO</th>
               <th className="p-3 text-left font-semibold text-primary">MODELO</th>
               <th className="p-3 text-left font-semibold text-primary">ANO</th>
               <th className="p-3 text-left font-semibold text-primary">COR</th>
-              <th className="p-3 text-left font-semibold text-primary">CLIENTE</th>
+              <th className="p-3 text-left font-semibold text-primary">EMPRESA</th>
               <th className="p-3 text-left font-semibold text-primary">STATUS</th>
             </tr>
           </thead>
@@ -96,24 +92,26 @@ export default function VeiculosConsulta() {
                     </Button>
                   </td>
                   <td className="p-3 font-mono font-medium">{v.placa}</td>
+                  <td className="p-3">{v.tipo}</td>
                   <td className="p-3">{v.modelo}</td>
                   <td className="p-3">{v.ano}</td>
                   <td className="p-3">{v.cor}</td>
-                  <td className="p-3">{v.cliente}</td>
+                  <td className="p-3">{v.empresa}</td>
                   <td className="p-3">
                     <Badge variant="outline" className={cn(statusBadgeBase, statusEquipColor[v.statusEquip])}>{v.statusEquip}</Badge>
                   </td>
                 </tr>
                 {expandedRow === v.id && (
                   <tr key={`${v.id}-detail`} className="bg-muted/10">
-                    <td colSpan={7} className="p-0">
+                    <td colSpan={8} className="p-0">
                       <div className="p-6 border-l-4 border-primary space-y-3">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                           <ReadField label="Placa" value={v.placa} />
+                          <ReadField label="Tipo" value={v.tipo} />
                           <ReadField label="Modelo" value={v.modelo} />
                           <ReadField label="Ano" value={v.ano.toString()} />
                           <ReadField label="Cor" value={v.cor} />
-                          <ReadField label="Cliente" value={v.cliente} />
+                          <ReadField label="Empresa" value={v.empresa} />
                           <ReadField label="Última OS" value={`#${v.ultimaOS}`} />
                         </div>
                         {v.equipamentos.length > 0 ? (
@@ -150,7 +148,7 @@ export default function VeiculosConsulta() {
               </>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Nenhum veículo encontrado.</td></tr>
+              <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">Nenhum veículo encontrado.</td></tr>
             )}
           </tbody>
         </table>

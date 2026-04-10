@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import {
+  normalizeServiceOrderSearch,
+  formatServiceOrderDate,
+  serviceOrderSchedulingStatusColorMap,
+  serviceOrderStatusColorMap,
+  serviceOrderTypeLabels,
+  useServiceOrders,
+  type ServiceOrderRecord,
+} from "@/data/service-orders";
 
 const searchFields = [
   { value: "id", label: "ID" },
@@ -19,56 +28,69 @@ const searchFields = [
   { value: "tecnico", label: "TÉCNICO" },
   { value: "veiculo", label: "VEÍCULO" },
   { value: "cliente", label: "CLIENTE" },
+  { value: "status", label: "STATUS" },
+  { value: "agendamento_status", label: "STATUS AGEND." },
   { value: "abertura", label: "ABERTURA" },
   { value: "realizacao", label: "REALIZAÇÃO" },
+  { value: "agendamento", label: "AGENDAMENTO" },
   { value: "total", label: "TOTAL" },
   { value: "equip_serial", label: "EQUIP. SERIAL" },
   { value: "equip_id", label: "EQUIP. ID" },
 ];
-
-const tipoLabels: Record<string, string> = {
-  INSTALACAO: "Instalação",
-  RETIRADA: "Retirada",
-  MANUTENCAO: "Manutenção",
-  REINSTALACAO: "Reinstalação",
-  SOCORRO_TECNICO: "Socorro Técnico",
-  TRANSFERENCIA: "Transferência",
-};
-
-const mockOrders = [
-  { id: 188432, pedido: "PED-2024-3421", tipo: "INSTALACAO", tecnico: "Carlos Silva", veiculo: "ABC1234", cliente: "Volare Segurança", empresa: "Volare Segurança", abertura: "04/04/2026", realizacao: "05/04/2026", total: "R$ 450,00", status: "Em agendamento", defeito_relatado: "Instalação de rastreador 4G", defeito_constatado: "N/A", observacao: "Cliente solicitou instalação urgente", equipamentos: [{ serial: "TJ-2024-001", produto: "TJammer 4G", acao: "Instalação" }], despesas: [{ descricao: "Deslocamento", valor: "R$ 50,00" }] },
-  { id: 188431, pedido: "PED-2024-3420", tipo: "RETIRADA", tecnico: "João Santos", veiculo: "XYZ5678", cliente: "Tracker Brasil", empresa: "Tracker Brasil", abertura: "04/04/2026", realizacao: "-", total: "R$ 200,00", status: "Agendada", defeito_relatado: "Retirada por cancelamento", defeito_constatado: "Equipamento em bom estado", observacao: "", equipamentos: [{ serial: "TJ-2023-145", produto: "TBlock", acao: "Retirada" }], despesas: [] },
-  { id: 188430, pedido: "PED-2024-3419", tipo: "MANUTENCAO", tecnico: "Pedro Lima", veiculo: "DEF9012", cliente: "LogSafe", empresa: "LogSafe", abertura: "03/04/2026", realizacao: "04/04/2026", total: "R$ 320,00", status: "Em Execução", defeito_relatado: "Equipamento sem sinal", defeito_constatado: "Antena danificada", observacao: "Substituição de antena realizada", equipamentos: [{ serial: "TJ-2023-089", produto: "Rastreador 4G", acao: "Manutenção" }], despesas: [{ descricao: "Antena substituta", valor: "R$ 45,00" }] },
-  { id: 188429, pedido: "PED-2024-3418", tipo: "REINSTALACAO", tecnico: "Ana Costa", veiculo: "GHI3456", cliente: "TransGuarda", empresa: "TransGuarda", abertura: "03/04/2026", realizacao: "04/04/2026", total: "R$ 580,00", status: "Finalizada", defeito_relatado: "Reinstalação após troca de veículo", defeito_constatado: "N/A", observacao: "", equipamentos: [{ serial: "TJ-2024-012", produto: "TJammer 4G", acao: "Reinstalação" }], despesas: [] },
-  { id: 188428, pedido: "PED-2024-3417", tipo: "INSTALACAO", tecnico: "Carlos Silva", veiculo: "JKL7890", cliente: "FleetShield", empresa: "FleetShield", abertura: "02/04/2026", realizacao: "03/04/2026", total: "R$ 450,00", status: "Validada", defeito_relatado: "Instalação padrão", defeito_constatado: "N/A", observacao: "Instalação concluída sem problemas", equipamentos: [{ serial: "TJ-2024-055", produto: "TBlock", acao: "Instalação" }, { serial: "TJ-2024-056", produto: "Rastreador 4G", acao: "Instalação" }], despesas: [{ descricao: "Material extra", valor: "R$ 30,00" }] },
-  { id: 188427, pedido: "PED-2024-3416", tipo: "SOCORRO_TECNICO", tecnico: "João Santos", veiculo: "MNO1234", cliente: "Volare Segurança", empresa: "Volare Segurança", abertura: "02/04/2026", realizacao: "02/04/2026", total: "R$ 150,00", status: "Faturada", defeito_relatado: "Veículo não responde ao comando", defeito_constatado: "Falha na comunicação do módulo", observacao: "Reset do módulo realizado", equipamentos: [{ serial: "TJ-2022-200", produto: "TJammer 4G", acao: "Manutenção" }], despesas: [] },
-];
-
 export default function ServiceOrderConsulta() {
   const [searchField, setSearchField] = useState("id");
   const [searchValue, setSearchValue] = useState("");
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+  const orders = useServiceOrders();
 
-  const filteredOrders = mockOrders.filter((order) => {
-    if (!searchValue) return true;
-    const val = searchValue.toLowerCase();
-    switch (searchField) {
-      case "id": return order.id.toString().includes(val);
-      case "pedido": return order.pedido.toLowerCase().includes(val);
-      case "tipo": return (tipoLabels[order.tipo] || order.tipo).toLowerCase().includes(val);
-      case "tecnico": return order.tecnico.toLowerCase().includes(val);
-      case "veiculo": return order.veiculo.toLowerCase().includes(val);
-      case "cliente": return order.cliente.toLowerCase().includes(val);
-      case "abertura": return order.abertura.includes(val);
-      case "realizacao": return order.realizacao.includes(val);
-      case "total": return order.total.toLowerCase().includes(val);
-      case "equip_serial": return order.equipamentos.some(e => e.serial.toLowerCase().includes(val));
-      case "equip_id": return order.equipamentos.some(e => e.serial.toLowerCase().includes(val));
-      default: return true;
-    }
-  });
+  const filteredOrders = useMemo(() => {
+    const normalizedSearch = normalizeServiceOrderSearch(searchValue);
+
+    return orders.filter((order) => {
+      if (!normalizedSearch) {
+        return true;
+      }
+
+      switch (searchField) {
+        case "id":
+          return normalizeServiceOrderSearch(order.id.toString()).includes(normalizedSearch);
+        case "pedido":
+          return normalizeServiceOrderSearch(order.pedido).includes(normalizedSearch);
+        case "tipo":
+          return normalizeServiceOrderSearch(serviceOrderTypeLabels[order.tipo] || order.tipo).includes(normalizedSearch);
+        case "tecnico":
+          return normalizeServiceOrderSearch(order.tecnico).includes(normalizedSearch);
+        case "veiculo":
+          return normalizeServiceOrderSearch(order.veiculo).includes(normalizedSearch);
+        case "cliente":
+          return normalizeServiceOrderSearch(order.cliente).includes(normalizedSearch);
+        case "status":
+          return normalizeServiceOrderSearch(order.status).includes(normalizedSearch);
+        case "agendamento_status":
+          return normalizeServiceOrderSearch(order.agendamentoStatus).includes(normalizedSearch);
+        case "abertura":
+          return normalizeServiceOrderSearch(order.abertura).includes(normalizedSearch);
+        case "realizacao":
+          return normalizeServiceOrderSearch(order.realizacao).includes(normalizedSearch);
+        case "agendamento":
+          return normalizeServiceOrderSearch([
+            order.agendamentoData,
+            order.agendamentoHora,
+            order.agendamentoObservacao,
+          ].join(" ")).includes(normalizedSearch);
+        case "total":
+          return normalizeServiceOrderSearch(order.total).includes(normalizedSearch);
+        case "equip_serial":
+          return order.equipamentos.some((equipment) => normalizeServiceOrderSearch(equipment.serial).includes(normalizedSearch));
+        case "equip_id":
+          return order.equipamentos.some((equipment) => normalizeServiceOrderSearch(equipment.serial).includes(normalizedSearch));
+        default:
+          return true;
+      }
+    });
+  }, [orders, searchField, searchValue]);
 
   const totalPages = Math.max(1, Math.ceil(filteredOrders.length / perPage));
   const paginatedOrders = filteredOrders.slice((currentPage - 1) * perPage, currentPage * perPage);
@@ -117,6 +139,7 @@ export default function ServiceOrderConsulta() {
                 <th className="p-3 text-left font-semibold text-primary">TÉCNICO</th>
                 <th className="p-3 text-left font-semibold text-primary">VEÍCULO</th>
                 <th className="p-3 text-left font-semibold text-primary">CLIENTE</th>
+                <th className="p-3 text-left font-semibold text-primary">STATUS</th>
                 <th className="p-3 text-left font-semibold text-primary">REALIZAÇÃO</th>
                 <th className="p-3 text-right font-semibold text-primary">TOTAL</th>
               </tr>
@@ -143,16 +166,21 @@ export default function ServiceOrderConsulta() {
                     </td>
                     <td className="p-3 font-mono font-medium">{order.id}</td>
                     <td className="p-3">{order.pedido}</td>
-                    <td className="p-3">{tipoLabels[order.tipo] || order.tipo}</td>
+                    <td className="p-3">{serviceOrderTypeLabels[order.tipo] || order.tipo}</td>
                     <td className="p-3">{order.tecnico}</td>
                     <td className="p-3 font-mono">{order.veiculo}</td>
                     <td className="p-3">{order.cliente}</td>
+                    <td className="p-3">
+                      <Badge variant="secondary" className={cn("text-xs font-medium", serviceOrderStatusColorMap[order.status])}>
+                        {order.status}
+                      </Badge>
+                    </td>
                     <td className="p-3">{order.realizacao}</td>
                     <td className="p-3 text-right font-medium">{order.total}</td>
                   </tr>
                   {expandedRow === order.id && (
                     <tr key={`${order.id}-detail`} className="bg-muted/10">
-                      <td colSpan={9} className="p-0">
+                      <td colSpan={10} className="p-0">
                         <OrderDetail order={order} />
                       </td>
                     </tr>
@@ -161,7 +189,7 @@ export default function ServiceOrderConsulta() {
               ))}
               {paginatedOrders.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="p-8 text-center text-muted-foreground">
+                  <td colSpan={10} className="p-8 text-center text-muted-foreground">
                     Nenhuma ordem encontrada.
                   </td>
                 </tr>
@@ -216,28 +244,43 @@ export default function ServiceOrderConsulta() {
   );
 }
 
-function OrderDetail({ order }: { order: typeof mockOrders[0] }) {
+function OrderDetail({ order }: { order: ServiceOrderRecord }) {
   return (
     <div className="p-6 space-y-4 border-l-4 border-primary">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ReadOnlyField label="ID" value={order.id.toString()} />
         <ReadOnlyField label="Pedido" value={order.pedido} />
-        <ReadOnlyField label="Tipo" value={tipoLabels[order.tipo] || order.tipo} />
+        <ReadOnlyField label="Tipo" value={serviceOrderTypeLabels[order.tipo] || order.tipo} />
         <ReadOnlyField label="Status" value={order.status} />
         <ReadOnlyField label="Técnico" value={order.tecnico} />
         <ReadOnlyField label="Veículo" value={order.veiculo} />
         <ReadOnlyField label="Cliente" value={order.cliente} />
         <ReadOnlyField label="Empresa Faturamento" value={order.empresa} />
+        <ReadOnlyField
+          label="Status do agendamento"
+          value={order.agendamentoStatus}
+          badgeClassName={serviceOrderSchedulingStatusColorMap[order.agendamentoStatus]}
+        />
         <ReadOnlyField label="Data Abertura" value={order.abertura} />
         <ReadOnlyField label="Data Realização" value={order.realizacao} />
+        <ReadOnlyField label="Valor Técnico" value={order.valorTecnico || "-"} />
+        <ReadOnlyField label="Valor Cliente" value={order.valorCliente || "-"} />
         <ReadOnlyField label="Total" value={order.total} />
+        <ReadOnlyField label="Data de retorno" value={formatServiceOrderDate(order.agendamentoData)} />
+        <ReadOnlyField label="Hora de retorno" value={order.agendamentoHora} />
+        <ReadOnlyField label="Observação do retorno" value={order.agendamentoObservacao} fullWidth />
+        <ReadOnlyField label="Responsável" value={order.responsavel} />
+        <ReadOnlyField label="Cargo" value={order.cargo} />
+        <ReadOnlyField label="UF" value={order.uf} />
+        <ReadOnlyField label="Cidade" value={order.cidade} />
+        <ReadOnlyField label="Endereço" value={order.endereco} fullWidth />
       </div>
 
-      {order.defeito_relatado && (
-        <ReadOnlyField label="Defeito Relatado" value={order.defeito_relatado} fullWidth />
+      {order.defeitoRelatado && (
+        <ReadOnlyField label="Defeito Relatado" value={order.defeitoRelatado} fullWidth />
       )}
-      {order.defeito_constatado && (
-        <ReadOnlyField label="Defeito Constatado" value={order.defeito_constatado} fullWidth />
+      {order.defeitoConstatado && (
+        <ReadOnlyField label="Defeito Constatado" value={order.defeitoConstatado} fullWidth />
       )}
       {order.observacao && (
         <ReadOnlyField label="Observação" value={order.observacao} fullWidth />
@@ -298,11 +341,14 @@ function OrderDetail({ order }: { order: typeof mockOrders[0] }) {
   );
 }
 
-function ReadOnlyField({ label, value, fullWidth }: { label: string; value: string; fullWidth?: boolean }) {
+function ReadOnlyField({ label, value, fullWidth, badgeClassName }: { label: string; value: string; fullWidth?: boolean; badgeClassName?: string }) {
   return (
     <div className={fullWidth ? "col-span-full" : ""}>
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <p className="text-sm font-medium text-foreground mt-0.5 bg-muted/30 rounded px-3 py-1.5 border">
+      <p className={cn(
+        "text-sm font-medium text-foreground mt-0.5 rounded px-3 py-1.5 border",
+        badgeClassName ?? "bg-muted/30"
+      )}>
         {value || "-"}
       </p>
     </div>
