@@ -50,6 +50,8 @@ const createBlankFormData = (): ServiceOrderFormPayload => ({
   agendamentoData: "",
   agendamentoHora: "",
   agendamentoObservacao: "",
+  equipamentos: [],
+  despesas: [],
 });
 
 const buildFormDataFromOrder = (order?: ServiceOrderRecord): ServiceOrderFormPayload => {
@@ -82,6 +84,8 @@ const buildFormDataFromOrder = (order?: ServiceOrderRecord): ServiceOrderFormPay
     agendamentoData: order.agendamentoData,
     agendamentoHora: order.agendamentoHora,
     agendamentoObservacao: order.agendamentoObservacao,
+    equipamentos: order.equipamentos ?? [],
+    despesas: order.despesas ?? [],
   };
 };
 
@@ -215,8 +219,8 @@ export default function NewServiceOrderDialog({ order, trigger, onSaved }: Props
       cidade: formData.cidade,
       endereco: formData.endereco,
       agendamentoStatus: formData.agendamentoStatus,
-      equipamentos: [],
-      despesas: [],
+      equipamentos: formData.equipamentos,
+      despesas: formData.despesas,
       agendamentoData: formData.agendamentoData,
       agendamentoHora: formData.agendamentoHora,
       agendamentoObservacao: formData.agendamentoObservacao,
@@ -284,10 +288,16 @@ export default function NewServiceOrderDialog({ order, trigger, onSaved }: Props
                 <ServiceOrderFormData formData={formData} onChange={handleChange} />
               </TabsContent>
               <TabsContent value="equipamentos" className="mt-0">
-                <ServiceOrderFormEquipamentos />
+                <ServiceOrderFormEquipamentos
+                  equipamentos={formData.equipamentos}
+                  onChange={(equipamentos) => handleChange({ equipamentos })}
+                />
               </TabsContent>
               <TabsContent value="despesas" className="mt-0">
-                <ServiceOrderFormDespesas />
+                <ServiceOrderFormDespesas
+                  despesas={formData.despesas}
+                  onChange={(despesas) => handleChange({ despesas })}
+                />
               </TabsContent>
               <TabsContent value="faturamento" className="mt-0">
                 <ServiceOrderFormFaturamento formData={formData} onChange={handleChange} />
