@@ -93,6 +93,8 @@ export interface ServiceOrderFormPayload {
   agendamentoData: string;
   agendamentoHora: string;
   agendamentoObservacao: string;
+  equipamentos: ServiceOrderEquipment[];
+  despesas: ServiceOrderExpense[];
 }
 
 export const serviceOrderStatusOptions: Array<{ value: ServiceOrderStatus; label: string }> = [
