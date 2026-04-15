@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import { OsAssistantConfigDialog } from "@/components/ai/OsAssistantConfigDialog";
 
 const breadcrumbMap: Record<string, string> = {
   "/": "Dashboard",

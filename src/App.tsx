@@ -26,6 +26,7 @@ import Veiculos from "@/pages/manutencoes/Veiculos";
 import RelatorioOrdens from "@/pages/relatorios/RelatorioOrdens";
 import PlacasRetiradas from "@/pages/relatorios/PlacasRetiradas";
 import UsuariosSistema from "@/pages/UsuariosSistema";
+import ConfiguracaoSAP from "@/pages/ConfiguracaoSAP";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ const App = () => (
               <Route path="/relatorios/ordens" element={<RelatorioOrdens />} />
               <Route path="/relatorios/placas-retiradas" element={<PlacasRetiradas />} />
               <Route path="/usuarios" element={<UsuariosSistema />} />
+              <Route path="/configuracao/sap" element={<ConfiguracaoSAP />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

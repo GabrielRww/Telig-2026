@@ -67,6 +67,7 @@ export interface ServiceOrderRecord {
   agendamentoHora: string;
   agendamentoObservacao: string;
   agendamentoRetornoAt: string;
+  sapServiceCallId?: number;
 }
 
 export interface ServiceOrderFormPayload {

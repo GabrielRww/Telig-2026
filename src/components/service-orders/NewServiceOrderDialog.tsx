@@ -26,6 +26,9 @@ import {
   type ServiceOrderStatus,
   upsertServiceOrder,
 } from "@/data/service-orders";
+import { isSAPConfigured } from "@/integrations/sap/client";
+import { createSAPServiceCall, updateSAPServiceCall } from "@/integrations/sap/serviceCalls";
+import { createSAPInvoice } from "@/integrations/sap/invoices";
 
 const createBlankFormData = (): ServiceOrderFormPayload => ({
   tipo: "",
@@ -215,13 +218,37 @@ export default function NewServiceOrderDialog({ order, trigger, onSaved }: Props
       cidade: formData.cidade,
       endereco: formData.endereco,
       agendamentoStatus: formData.agendamentoStatus,
-      equipamentos: [],
-      despesas: [],
+      equipamentos: order?.equipamentos ?? [],
+      despesas: order?.despesas ?? [],
       agendamentoData: formData.agendamentoData,
       agendamentoHora: formData.agendamentoHora,
       agendamentoObservacao: formData.agendamentoObservacao,
       agendamentoRetornoAt: "",
+      sapServiceCallId: order?.sapServiceCallId,
     });
+
+    // Sincronizar com SAP B1 (assíncrono, sem bloquear o fluxo)
+    if (isSAPConfigured()) {
+      (async () => {
+        try {
+          if (order?.sapServiceCallId) {
+            await updateSAPServiceCall(order.sapServiceCallId, savedOrder);
+          } else {
+            const sapCallId = await createSAPServiceCall(savedOrder);
+            upsertServiceOrder({ ...savedOrder, sapServiceCallId: sapCallId });
+          }
+
+          if (savedOrder.status === "Faturada") {
+            await createSAPInvoice(savedOrder);
+          }
+
+          toast.success("OS sincronizada com SAP B1");
+        } catch (err) {
+          console.error("Erro ao sincronizar com SAP:", err);
+          toast.warning("OS salva localmente. Sincronização com SAP pendente.");
+        }
+      })();
+    }
 
     const vehicleWasRemoved = formData.tipo === "RETIRADA"
       ? removeVehicleByPlate(formData.veiculo, { osType: formData.tipo })

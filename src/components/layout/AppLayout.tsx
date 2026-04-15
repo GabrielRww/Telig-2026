@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
+import { OsAssistantChat } from "@/components/ai/OSAssistantChat";
 
 export function AppLayout() {
   return (
@@ -24,6 +25,7 @@ export function AppLayout() {
           </main>
         </div>
       </div>
+      <OsAssistantChat />
     </SidebarProvider>
   );
 }

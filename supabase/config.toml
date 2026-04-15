@@ -1,1 +1,7 @@
 project_id = "icwdxhfslqojuwizdrqw"
+
+[functions.os-assistant]
+verify_jwt = false
+
+[functions.sap-proxy]
+verify_jwt = false

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -5,13 +6,15 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import VehicleSelectDialog from "./VehicleSelectDialog";
 import {
   serviceOrderStatusOptions,
   type ServiceOrderFormPayload,
   type ServiceOrderStatus,
 } from "@/data/service-orders";
+import { useSAPClients, useSAPVendors } from "@/hooks/useSAPBusinessPartners";
+import { isSAPConfigured } from "@/integrations/sap/client";
 
 const tipoOptions = [
   { value: "INSTALACAO", label: "Instalação" },
@@ -36,12 +39,19 @@ const editableStatusValues = new Set<ServiceOrderStatus>([
 
 const statusOptions = serviceOrderStatusOptions.filter((option) => editableStatusValues.has(option.value));
 
-const clienteOptions = [
+const staticClienteOptions = [
   "Volare Segurança",
   "Tracker Brasil",
   "LogSafe",
   "TransGuarda",
   "FleetShield",
+];
+
+const staticTecnicoOptions = [
+  "Carlos Silva",
+  "João Santos",
+  "Pedro Lima",
+  "Ana Costa",
 ];
 
 type FormData = ServiceOrderFormPayload;
@@ -52,6 +62,25 @@ interface Props {
 }
 
 export default function ServiceOrderFormData({ formData, onChange }: Props) {
+  const sapEnabled = isSAPConfigured();
+  const { data: sapClients, isLoading: loadingClients } = useSAPClients();
+  const { data: sapVendors, isLoading: loadingVendors } = useSAPVendors();
+
+  const [clienteFilter, setClienteFilter] = useState("");
+  const [tecnicoFilter, setTecnicoFilter] = useState("");
+
+  const clienteOptions = sapEnabled && sapClients
+    ? sapClients
+        .filter((c) => c.CardName.toLowerCase().includes(clienteFilter.toLowerCase()))
+        .map((c) => ({ value: c.CardCode, label: c.CardName }))
+    : staticClienteOptions.map((n) => ({ value: n, label: n }));
+
+  const tecnicoOptions = sapEnabled && sapVendors
+    ? sapVendors
+        .filter((v) => v.CardName.toLowerCase().includes(tecnicoFilter.toLowerCase()))
+        .map((v) => ({ value: v.CardCode, label: v.CardName }))
+    : staticTecnicoOptions.map((n) => ({ value: n, label: n }));
+
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold text-foreground">Dados</h3>
@@ -76,10 +105,27 @@ export default function ServiceOrderFormData({ formData, onChange }: Props) {
         <div className="space-y-1.5">
           <Label className="text-sm">*Cliente</Label>
           <Select value={formData.cliente} onValueChange={(v) => onChange({ cliente: v })}>
-            <SelectTrigger><SelectValue placeholder="Nada selecionado" /></SelectTrigger>
+            <SelectTrigger>
+              {loadingClients ? (
+                <span className="flex items-center gap-1 text-muted-foreground"><Loader2 size={12} className="animate-spin" />Carregando...</span>
+              ) : (
+                <SelectValue placeholder="Nada selecionado" />
+              )}
+            </SelectTrigger>
             <SelectContent>
-              {clienteOptions.map((option) => (
-                <SelectItem key={option} value={option}>{option}</SelectItem>
+              {sapEnabled && (
+                <div className="px-2 py-1">
+                  <Input
+                    placeholder="Buscar cliente..."
+                    value={clienteFilter}
+                    onChange={(e) => setClienteFilter(e.target.value)}
+                    className="h-7 text-sm"
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                </div>
+              )}
+              {clienteOptions.map((o) => (
+                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -89,8 +135,8 @@ export default function ServiceOrderFormData({ formData, onChange }: Props) {
           <Select value={formData.empresaFaturamento} onValueChange={(v) => onChange({ empresaFaturamento: v })}>
             <SelectTrigger><SelectValue placeholder="Nada selecionado" /></SelectTrigger>
             <SelectContent>
-              {clienteOptions.map((option) => (
-                <SelectItem key={option} value={option}>{option}</SelectItem>
+              {clienteOptions.map((o) => (
+                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -99,12 +145,28 @@ export default function ServiceOrderFormData({ formData, onChange }: Props) {
         <div className="space-y-1.5">
           <Label className="text-sm">Técnico</Label>
           <Select value={formData.tecnico} onValueChange={(v) => onChange({ tecnico: v })}>
-            <SelectTrigger><SelectValue placeholder="Nada selecionado" /></SelectTrigger>
+            <SelectTrigger>
+              {loadingVendors ? (
+                <span className="flex items-center gap-1 text-muted-foreground"><Loader2 size={12} className="animate-spin" />Carregando...</span>
+              ) : (
+                <SelectValue placeholder="Nada selecionado" />
+              )}
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Carlos Silva">Carlos Silva</SelectItem>
-              <SelectItem value="João Santos">João Santos</SelectItem>
-              <SelectItem value="Pedro Lima">Pedro Lima</SelectItem>
-              <SelectItem value="Ana Costa">Ana Costa</SelectItem>
+              {sapEnabled && (
+                <div className="px-2 py-1">
+                  <Input
+                    placeholder="Buscar técnico..."
+                    value={tecnicoFilter}
+                    onChange={(e) => setTecnicoFilter(e.target.value)}
+                    className="h-7 text-sm"
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                </div>
+              )}
+              {tecnicoOptions.map((o) => (
+                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
