@@ -27,6 +27,10 @@ import RelatorioOrdens from "@/pages/relatorios/RelatorioOrdens";
 import PlacasRetiradas from "@/pages/relatorios/PlacasRetiradas";
 import UsuariosSistema from "@/pages/UsuariosSistema";
 import ConfiguracaoSAP from "@/pages/ConfiguracaoSAP";
+import NotasFiscais from "@/pages/financeiro/NotasFiscais";
+import ContasReceber from "@/pages/financeiro/ContasReceber";
+import ContasPagar from "@/pages/financeiro/ContasPagar";
+import RelatorioFinanceiro from "@/pages/financeiro/RelatorioFinanceiro";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +65,10 @@ const App = () => (
               <Route path="/relatorios/placas-retiradas" element={<PlacasRetiradas />} />
               <Route path="/usuarios" element={<UsuariosSistema />} />
               <Route path="/configuracao/sap" element={<ConfiguracaoSAP />} />
+              <Route path="/financeiro/notas-fiscais" element={<NotasFiscais />} />
+              <Route path="/financeiro/contas-receber" element={<ContasReceber />} />
+              <Route path="/financeiro/contas-pagar" element={<ContasPagar />} />
+              <Route path="/financeiro/relatorio" element={<RelatorioFinanceiro />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

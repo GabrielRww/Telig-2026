@@ -49,10 +49,10 @@ export async function sapPatch(endpoint: string, id: number | string, body: obje
 }
 
 export function sapLogout() {
-  // No proxy, a sessão é gerenciada server-side automaticamente
+
 }
 
 export function isSAPConfigured(): boolean {
-  // Com o proxy, sempre está "configurado" — as credenciais ficam no Supabase
+
   return true;
 }

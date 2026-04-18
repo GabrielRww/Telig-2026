@@ -5,7 +5,7 @@ import {
   LayoutDashboard, ShieldCheck, ClipboardCheck, Car, Package,
   ClipboardList, FileSearch, ShoppingCart, Settings, BarChart3, Users,
   ChevronDown, ChevronLeft, ChevronRight, Building2, UserCog, Tag,
-  Box, Cpu, CarFront, FileText,
+  Box, Cpu, CarFront, FileText, Wallet, TrendingUp, TrendingDown, PieChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +38,16 @@ const menuItems: MenuItem[] = [
       { label: "Produtos", path: "/manutencoes/produtos", icon: Box },
       { label: "Equipamentos", path: "/manutencoes/equipamentos", icon: Cpu },
       { label: "Veículos", path: "/manutencoes/veiculos", icon: CarFront },
+    ],
+  },
+  {
+    label: "Financeiro",
+    icon: Wallet,
+    children: [
+      { label: "Notas Fiscais", path: "/financeiro/notas-fiscais", icon: FileText },
+      { label: "Contas a Receber", path: "/financeiro/contas-receber", icon: TrendingUp },
+      { label: "Contas a Pagar", path: "/financeiro/contas-pagar", icon: TrendingDown },
+      { label: "Relatório Financeiro", path: "/financeiro/relatorio", icon: PieChart },
     ],
   },
   {
